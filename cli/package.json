@@ -1,0 +1,12 @@
+{
+  "name": "agentmail",
+  "version": "1.0.0",
+  "description": "Email for AI agents. One command setup.",
+  "main": "src/sdk.js",
+  "bin": { "agentmail": "./src/cli.js" },
+  "keywords": ["ai","agent","email","bot","claude","llm"],
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0"
+  }
+}
