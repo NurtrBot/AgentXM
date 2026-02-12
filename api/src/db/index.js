@@ -2,9 +2,13 @@ const initSqlJs = require("sql.js");
 const fs = require("fs");
 const path = require("path");
 
-const DB_DIR = process.env.RAILWAY_ENVIRONMENT
-  ? "/tmp"
-  : path.resolve(__dirname, "../../data");
+// Use Railway Volume (/data) for persistence, fallback to /tmp, local dev uses ./data
+let DB_DIR;
+if (process.env.RAILWAY_ENVIRONMENT) {
+  DB_DIR = fs.existsSync("/data") ? "/data" : "/tmp";
+} else {
+  DB_DIR = path.resolve(__dirname, "../../data");
+}
 const DB_PATH = path.join(DB_DIR, "agentmx.db");
 let db = null;
 
