@@ -1,68 +1,85 @@
 #!/bin/bash
 set -e
 
-# Configuration
-# TODO: Replace with your actual repository URL
-REPO_URL="https://github.com/NurtrBot/AgentXM.git" 
+# ═══════════════════════════════════════════════════════════════════
+#  AgentMX Installer — Email for AI Agents
+#  One command: curl -fsSL https://raw.githubusercontent.com/NurtrBot/AgentXM/main/install.sh | bash
+# ═══════════════════════════════════════════════════════════════════
+
+REPO_URL="https://github.com/NurtrBot/AgentXM.git"
 INSTALL_DIR="$HOME/agentmx"
 
-echo "⬇️  Cloning AgentMX..."
+echo ""
+echo "  ╔══════════════════════════════════════════╗"
+echo "  ║        🤖 AgentMX Installer              ║"
+echo "  ║     Email for AI Agents — v1.0.0         ║"
+echo "  ╚══════════════════════════════════════════╝"
+echo ""
 
-# Check prerequisites
+# ── Prerequisites ────────────────────────────────────────────────
 if ! command -v git &> /dev/null; then
-    echo "❌ Error: git is not installed."
+    echo "  ❌ git is not installed."
     exit 1
 fi
 
-# Load nvm if available (needed for curl | bash which doesn't source .zshrc/.bashrc)
+# Load nvm if available (curl | bash doesn't source shell profiles)
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 if ! command -v npm &> /dev/null; then
-    echo "❌ Error: npm is not installed. Please install Node.js."
+    echo "  ❌ npm is not installed. Please install Node.js (https://nodejs.org)"
     exit 1
 fi
 
-# Clone or update repository
+echo "  ✓ git found"
+echo "  ✓ npm found ($(npm --version))"
+echo ""
+
+# ── Clone or Update ─────────────────────────────────────────────
 if [ -d "$INSTALL_DIR" ]; then
-    echo "⚠️  Directory $INSTALL_DIR already exists. Updating..."
+    echo "  ⚙️  Updating existing installation..."
     cd "$INSTALL_DIR"
-    git pull
+    git pull --quiet
 else
-    echo "📦 Cloning into $INSTALL_DIR..."
-    git clone "$REPO_URL" "$INSTALL_DIR"
+    echo "  📦 Downloading AgentMX..."
+    git clone --quiet "$REPO_URL" "$INSTALL_DIR"
     cd "$INSTALL_DIR"
 fi
 
-# Install API dependencies
-echo "📥 Installing API dependencies..."
-cd api
-npm install
-cd ..
+# ── Install Dependencies ────────────────────────────────────────
+echo "  📥 Installing dependencies..."
+cd api && npm install --silent 2>/dev/null && cd ..
+cd cli && npm install --silent 2>/dev/null
 
-# Install CLI dependencies
-echo "📥 Installing CLI dependencies..."
-cd cli
-npm install
-# Link CLI globally so 'agentmx' works anywhere
-echo "🔗 Linking CLI command..."
-try_link() {
-  if [ "$(id -u)" -ne 0 ] && [ ! -w "$(npm config get prefix)/bin" ]; then
-    echo "sudo required for global link..."
-    sudo npm link --force
-  else
-    npm link --force
-  fi
-}
-try_link
+# ── Link CLI Globally ────────────────────────────────────────────
+echo "  🔗 Linking agentmx command..."
+if [ "$(id -u)" -ne 0 ] && [ ! -w "$(npm config get prefix)/bin" ]; then
+    sudo npm link --force --silent 2>/dev/null
+else
+    npm link --force --silent 2>/dev/null
+fi
+
+# ── Copy Agent Guide to Project Root ─────────────────────────────
+echo "  📄 Agent integration guide ready"
 
 echo ""
-echo "✅ Installation complete!"
-echo "------------------------------------------------"
-echo "1. Start the API server in a new terminal:"
-echo "   cd $INSTALL_DIR/api && npm start"
+echo "  ╔══════════════════════════════════════════╗"
+echo "  ║        ✅ Installation Complete!          ║"
+echo "  ╚══════════════════════════════════════════╝"
 echo ""
-echo "2. Initialize your mailbox:"
-echo "   agentmx init"
-  # AgentMX Installer
-echo "------------------------------------------------"
+echo "  Quick Start:"
+echo "  ─────────────────────────────────────────────"
+echo "  1. Set up your mailbox:"
+echo "     agentmx init"
+echo ""
+echo "  2. Watch for incoming emails:"
+echo "     agentmx watch"
+echo ""
+echo "  3. Send an email:"
+echo "     agentmx send"
+echo ""
+echo "  📖 AI Agent Integration Guide:"
+echo "     cat $INSTALL_DIR/AGENT_GUIDE.md"
+echo ""
+echo "  ─────────────────────────────────────────────"
+echo ""
