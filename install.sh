@@ -3,7 +3,7 @@ set -e
 
 # Configuration
 # TODO: Replace with your actual repository URL
-REPO_URL="https://github.com/your-username/agentmail.git" 
+REPO_URL="https://github.com/NurtrBot/AgentXM.git" 
 INSTALL_DIR="$HOME/agentmail"
 
 echo "🤖 Installing AgentMail..."
