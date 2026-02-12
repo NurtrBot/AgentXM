@@ -4,8 +4,33 @@ const { genId } = require("../utils");
 
 const r = express.Router();
 
+const crypto = require("crypto");
+
+// Mailgun signature verification middleware
+function verifyMailgun(req, res, next) {
+  const { signature, timestamp, token } = req.body;
+  if (!signature || !timestamp || !token) {
+    if (process.env.NODE_ENV === "development") return next(); // Skip in dev if missing
+    return res.status(401).json({ error: "Missing signature" });
+  }
+
+  const signingKey = process.env.MAILGUN_WEBHOOK_SIGNING_KEY;
+  if (!signingKey) {
+    console.warn("⚠️  MAILGUN_WEBHOOK_SIGNING_KEY not set. Skipping verification.");
+    return next();
+  }
+
+  const value = timestamp + token;
+  const hash = crypto.createHmac("sha256", signingKey).update(value).digest("hex");
+
+  if (hash !== signature) {
+    return res.status(401).json({ error: "Invalid signature" });
+  }
+  next();
+}
+
 // Mailgun inbound webhook
-r.post("/inbound", express.urlencoded({ extended: true }), (req, res) => {
+r.post("/inbound", express.urlencoded({ extended: true }), verifyMailgun, (req, res) => {
   try {
     const { sender, from, recipient, subject,
       "body-plain": bodyPlain, "body-html": bodyHtml, "stripped-text": stripped } = req.body;
@@ -30,6 +55,7 @@ r.post("/inbound", express.urlencoded({ extended: true }), (req, res) => {
 
 // Dev-only: simulate inbound email
 r.post("/simulate", (req, res) => {
+  // ... (keep simulate route related code)
   const { from, to, subject, body } = req.body;
   if (!from || !to) return res.status(400).json({ error: "from and to required" });
   const handle = to.split("@")[0]?.toLowerCase();
