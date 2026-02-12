@@ -13,6 +13,11 @@ if ! command -v git &> /dev/null; then
     echo "❌ Error: git is not installed."
     exit 1
 fi
+
+# Load nvm if available (needed for curl | bash which doesn't source .zshrc/.bashrc)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
 if ! command -v npm &> /dev/null; then
     echo "❌ Error: npm is not installed. Please install Node.js."
     exit 1
