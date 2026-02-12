@@ -24,4 +24,4 @@ yarn-error.log*
 
 # AgentMail specific
 api/data/*.db
-.agentmail/
+.agentmx/

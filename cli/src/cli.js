@@ -18,16 +18,16 @@ const c = {
 const LINE = c.dim("─".repeat(65));
 
 // ─── Config ──────────────────────────────────────────────────────
-const CONF_DIR = ".agentmail";
+const CONF_DIR = ".agentmx";
 const CONF_FILE = "config.json";
-const DOMAIN = "agentmail.dev";
+const DOMAIN = "agentmx.dev";
 
 function confPath() { return path.join(process.cwd(), CONF_DIR, CONF_FILE); }
 function hasConf() { return fs.existsSync(confPath()); }
 
 function loadConf() {
   if (!hasConf()) {
-    console.log(c.red("\n  No AgentMail config found."));
+    console.log(c.red("\n  No AgentMX config found."));
     console.log(c.dim("  Run: npx agentmail init\n"));
     process.exit(1);
   }
@@ -112,7 +112,7 @@ function table(headers, rows, widths) {
 // ─── Commands ────────────────────────────────────────────────────
 
 async function cmdInit(opts) {
-  console.log("\n" + c.bold("  🤖 AgentMail — Email for AI Agents"));
+  console.log("\n" + c.bold("  🤖 AgentMX — Email for AI Agents"));
   console.log("  " + LINE + "\n");
 
   if (hasConf()) {
@@ -163,8 +163,8 @@ async function cmdInit(opts) {
 
     // Auto-add to .gitignore
     const gi = path.join(process.cwd(), ".gitignore");
-    if (fs.existsSync(gi) && !fs.readFileSync(gi, "utf8").includes(".agentmail"))
-      fs.appendFileSync(gi, "\n.agentmail/\n");
+    if (fs.existsSync(gi) && !fs.readFileSync(gi, "utf8").includes(".agentmx"))
+      fs.appendFileSync(gi, "\n.agentmx/\n");
 
     console.log("\n" + c.green("  ✅ You're all set!"));
     console.log("  " + LINE);
@@ -265,7 +265,7 @@ async function cmdStatus() {
   const conf = loadConf();
   try {
     const s = await client.status();
-    console.log("\n" + c.bold("  🤖 AgentMail Status"));
+    console.log("\n" + c.bold("  🤖 AgentMX Status"));
     console.log("  " + LINE);
     console.log(`  📧 Email:     ${c.cyan(s.email)}`);
     console.log(`  🤖 Bot:       ${s.bot_name}`);
@@ -282,7 +282,7 @@ async function cmdStatus() {
 async function cmdConfig() {
   if (!hasConf()) { console.log(c.red("\n  No config. Run: npx agentmail init\n")); return; }
   const conf = loadConf();
-  console.log("\n" + c.bold("  AgentMail Config"));
+  console.log("\n" + c.bold("  AgentMX Config"));
   console.log("  " + LINE);
   console.log(`  Path:      ${confPath()}`);
   console.log(`  Email:     ${conf.email}`);

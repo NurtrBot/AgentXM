@@ -1,4 +1,4 @@
-# AgentMail — Complete Build & Setup Guide
+# AgentMX — Complete Build & Setup Guide
 
 > One command to give any AI agent its own email. No OAuth. No Google Workspace. No token refresh.
 
@@ -43,7 +43,7 @@ agentmail/
 cd agentmail/api
 npm install
 node src/index.js
-# 🤖 AgentMail API running on http://localhost:3001
+# 🤖 AgentMX API running on http://localhost:3001
 ```
 
 ### API Endpoints
@@ -104,14 +104,14 @@ app.use("/v1/mailbox", require("./routes/mailbox"));
 app.use("/v1/mail", require("./routes/mail"));
 app.use("/v1/webhook", require("./routes/webhook"));
 
-app.get("/", (req, res) => res.json({ service: "AgentMail API", version: "1.0.0" }));
+app.get("/", (req, res) => res.json({ service: "AgentMX API", version: "1.0.0" }));
 app.get("/health", (req, res) => res.json({ status: "ok" }));
 
 const PORT = process.env.PORT || 3001;
 
 db.init().then(() => {
   app.listen(PORT, () => {
-    console.log(`\n  🤖 AgentMail API running on http://localhost:${PORT}\n`);
+    console.log(`\n  🤖 AgentMX API running on http://localhost:${PORT}\n`);
   });
 }).catch(e => { console.error("DB init failed:", e); process.exit(1); });
 
@@ -194,7 +194,7 @@ module.exports = { init, all, one, run };
 const crypto = require("crypto");
 const { v4: uuidv4 } = require("uuid");
 
-const DOMAIN = "agentmail.dev";
+const DOMAIN = "agentmx.dev";
 
 function genId() { return uuidv4(); }
 

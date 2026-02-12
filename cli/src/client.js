@@ -3,13 +3,13 @@ const path = require("path");
 const http = require("http");
 const https = require("https");
 
-const CONFIG_DIR = ".agentmail";
+const CONFIG_DIR = ".agentmx";
 const CONFIG_FILE = "config.json";
 
 class AgentMail {
   constructor(opts = {}) {
     this.apiKey = opts.apiKey || null;
-    this.endpoint = opts.endpoint || "https://api.agentmail.dev";
+    this.endpoint = opts.endpoint || "https://api.agentmx.dev";
     this.email = opts.email || null;
     this.botName = opts.botName || null;
   }
