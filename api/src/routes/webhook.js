@@ -1,18 +1,21 @@
 const express = require("express");
+const multer = require("multer");
 const db = require("../db");
 const { genId } = require("../utils");
 
 const r = express.Router();
+const upload = multer(); // memory storage for multipart
 
 const crypto = require("crypto");
 
 // Mailgun signature verification middleware
 function verifyMailgun(req, res, next) {
-  console.log("📨 Webhook received:", JSON.stringify(Object.keys(req.body)));
-  const { signature, timestamp, token } = req.body;
+  console.log("📨 Webhook received. Content-Type:", req.headers["content-type"]);
+  console.log("📨 Body keys:", JSON.stringify(Object.keys(req.body || {})));
+  const { signature, timestamp, token } = req.body || {};
   if (!signature || !timestamp || !token) {
     console.warn("⚠️  Webhook missing signature fields. Allowing anyway for now.");
-    return next(); // Allow through for debugging
+    return next();
   }
 
   const signingKey = process.env.MAILGUN_WEBHOOK_SIGNING_KEY;
@@ -26,31 +29,42 @@ function verifyMailgun(req, res, next) {
 
   if (hash !== signature) {
     console.warn("⚠️  Webhook signature mismatch. Allowing anyway for debugging.");
-    return next(); // Allow through for debugging
+    return next();
   }
   next();
 }
 
-// Mailgun inbound webhook
-r.post("/inbound", express.urlencoded({ extended: true }), verifyMailgun, (req, res) => {
+// Mailgun inbound webhook — supports both multipart/form-data and urlencoded
+r.post("/inbound", upload.any(), express.urlencoded({ extended: true }), verifyMailgun, (req, res) => {
   try {
-    const { sender, from, recipient, subject,
-      "body-plain": bodyPlain, "body-html": bodyHtml, "stripped-text": stripped } = req.body;
-    const fromAddr = sender || from || "";
-    const toAddr = recipient || "";
+    const body = req.body || {};
+    const fromAddr = body.sender || body.from || "";
+    const toAddr = body.recipient || body.To || body.to || "";
+    const subject = body.subject || body.Subject || "(no subject)";
+    const bodyPlain = body["stripped-text"] || body["body-plain"] || "";
+    const bodyHtml = body["body-html"] || "";
+
+    console.log(`📬 Inbound: ${fromAddr} → ${toAddr} | Subject: ${subject}`);
+
     const handle = toAddr.split("@")[0]?.toLowerCase();
-    if (!handle) return res.status(200).json({ status: "skipped" });
+    if (!handle) {
+      console.warn("⚠️  No handle parsed from recipient:", toAddr);
+      return res.status(200).json({ status: "skipped", reason: "no handle" });
+    }
 
     const mailbox = db.one("SELECT * FROM mailboxes WHERE handle=?", [handle]);
-    if (!mailbox) return res.status(200).json({ status: "skipped" });
+    if (!mailbox) {
+      console.warn(`⚠️  No mailbox found for handle: ${handle}`);
+      return res.status(200).json({ status: "skipped", reason: "no mailbox" });
+    }
 
     const id = genId();
     db.run("INSERT INTO messages (id,mailbox_id,direction,from_address,to_address,subject,body_text,body_html) VALUES (?,?,'inbound',?,?,?,?,?)",
-      [id, mailbox.id, fromAddr, toAddr, subject || "(no subject)", stripped || bodyPlain || "", bodyHtml || ""]);
-    console.log(`📬 ${fromAddr} → ${toAddr}`);
+      [id, mailbox.id, fromAddr, toAddr, subject, bodyPlain, bodyHtml]);
+    console.log(`✅ Stored message ${id} for ${handle}`);
     res.status(200).json({ status: "stored", id });
   } catch (e) {
-    console.error("Webhook error:", e);
+    console.error("❌ Webhook error:", e);
     res.status(200).json({ status: "error" });
   }
 });

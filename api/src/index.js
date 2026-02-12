@@ -11,17 +11,16 @@ app.use(helmet());
 app.use(cors()); // TODO: Restrict CORS in production if needed
 app.use(express.json());
 
-// Rate Limiting
+// Rate Limiting (exclude webhooks — Mailgun needs unrestricted access)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: 100,
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use(limiter);
 
-app.use("/v1/mailbox", require("./routes/mailbox"));
-app.use("/v1/mail", require("./routes/mail"));
+app.use("/v1/mailbox", limiter, require("./routes/mailbox"));
+app.use("/v1/mail", limiter, require("./routes/mail"));
 app.use("/v1/webhook", require("./routes/webhook"));
 
 app.get("/", (req, res) => res.json({ service: "AgentMX API", version: "1.0.0" }));
