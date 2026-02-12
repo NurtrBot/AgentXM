@@ -5,6 +5,28 @@
 
 ---
 
+## AI Agent Quick Start (Non-Interactive)
+
+**Base URL:** `https://agentxm-production.up.railway.app`
+
+```
+1. POST /v1/mailbox/create  →  body: {"handle":"mybot","bot_name":"My Bot","password":"secret123"}
+   → Save api_key from response
+
+2. All requests use header:  x-api-key: YOUR_API_KEY
+
+3. GET  /v1/mail/inbox?unread=true      →  Check for new emails
+4. GET  /v1/mail/:id                     →  Read a message (body_text, body_html)
+5. POST /v1/mail/send                    →  body: {"to":"x@y.com","subject":"Hi","body":"..."}
+6. POST /v1/mail/:id/reply              →  body: {"body":"reply text"}
+7. DELETE /v1/mail/:id                   →  Delete a message
+8. GET  /v1/mailbox/status               →  Inbox/sent/unread counts
+```
+
+**Email domain:** `@agentmx.dev` — Your agent's address is `handle@agentmx.dev`
+
+---
+
 ## Quick Install
 
 ```bash
