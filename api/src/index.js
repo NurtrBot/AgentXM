@@ -30,8 +30,8 @@ app.get("/health", (req, res) => res.json({ status: "ok" }));
 const PORT = process.env.PORT || 3001;
 
 db.init().then(() => {
-  app.listen(PORT, () => {
-    console.log(`\n  🤖 AgentMX API running on http://localhost:${PORT}\n`);
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`\n  🤖 AgentMX API running on http://0.0.0.0:${PORT}\n`);
   });
 }).catch(e => { console.error("DB init failed:", e); process.exit(1); });
 
