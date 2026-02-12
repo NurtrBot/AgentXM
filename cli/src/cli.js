@@ -304,6 +304,70 @@ async function cmdConfig() {
   console.log("");
 }
 
+async function cmdWatch(opts) {
+  const client = getClient();
+  const conf = loadConf();
+  const interval = (opts.interval || 5) * 1000;
+  let seenIds = new Set();
+  let firstRun = true;
+
+  console.log("\n" + c.bold(`  👁️  Watching — ${c.cyan(conf.email)}`));
+  console.log("  " + LINE);
+  console.log(c.dim(`  Checking every ${interval / 1000}s • Press Ctrl+C to stop\n`));
+
+  async function poll() {
+    try {
+      const { messages, total } = await client.inbox({ limit: 25 });
+
+      if (firstRun) {
+        // On first run, seed seen IDs so we only notify on NEW emails
+        messages.forEach((m) => seenIds.add(m.id));
+        const unread = messages.filter((m) => !m.is_read).length;
+        console.log(c.dim(`  📬 ${total} messages in inbox (${unread} unread)`));
+        if (unread > 0) {
+          console.log("");
+          messages.filter((m) => !m.is_read).forEach((m) => {
+            console.log(`  ${c.blue("●")} ${pad(trunc(m.from_address, 25), 25)} │ ${c.bold(trunc(m.subject, 35))} │ ${c.dim(fmtDate(m.created_at))}`);
+          });
+        }
+        console.log("\n" + c.dim("  Waiting for new emails...\n"));
+        firstRun = false;
+        return;
+      }
+
+      // Check for new messages
+      const newMsgs = messages.filter((m) => !seenIds.has(m.id));
+      if (newMsgs.length > 0) {
+        newMsgs.forEach((m) => {
+          seenIds.add(m.id);
+          const time = fmtDate(m.created_at);
+          console.log(c.green(`  ┌─ 📨 NEW EMAIL ─────────────────────────────────────`));
+          console.log(c.green(`  │`) + ` From:    ${c.bold(m.from_address)}`);
+          console.log(c.green(`  │`) + ` Subject: ${c.bold(m.subject)}`);
+          console.log(c.green(`  │`) + ` Time:    ${c.dim(time)}`);
+          console.log(c.green(`  └────────────────────────────────────────────────────`));
+          console.log(c.dim(`  agentmx read ${m.id.slice(0, 8)} to open\n`));
+          // Bell sound for notification
+          process.stdout.write("\x07");
+        });
+      }
+    } catch (e) {
+      console.log(c.red(`  ⚠ Connection error: ${e.message}`));
+    }
+  }
+
+  // Initial poll
+  await poll();
+
+  // Keep polling
+  const timer = setInterval(poll, interval);
+  process.on("SIGINT", () => {
+    clearInterval(timer);
+    console.log(c.dim("\n  Stopped watching.\n"));
+    process.exit(0);
+  });
+}
+
 // ─── Program ─────────────────────────────────────────────────────
 const prog = new Command();
 prog.name("agentmx").description("Email for AI agents.").version("1.0.0");
@@ -312,6 +376,7 @@ prog.command("inbox").description("View inbox").action(cmdInbox);
 prog.command("sent").description("View sent mail").action(cmdSent);
 prog.command("read <index>").description("Read message by # or ID").action(cmdRead);
 prog.command("send").description("Compose and send").action(cmdSend);
+prog.command("watch").description("Watch inbox for new emails in real-time").option("-i, --interval <seconds>", "Poll interval in seconds", "5").action(cmdWatch);
 prog.command("status").description("Mailbox info and stats").action(cmdStatus);
 prog.command("config").description("Show config").action(cmdConfig);
 prog.parse(process.argv);
