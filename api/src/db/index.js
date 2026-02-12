@@ -2,7 +2,10 @@ const initSqlJs = require("sql.js");
 const fs = require("fs");
 const path = require("path");
 
-const DB_PATH = path.resolve(__dirname, "../../data/agentmail.db");
+const DB_DIR = process.env.RAILWAY_ENVIRONMENT
+  ? "/tmp"
+  : path.resolve(__dirname, "../../data");
+const DB_PATH = path.join(DB_DIR, "agentmx.db");
 let db = null;
 
 async function init() {
