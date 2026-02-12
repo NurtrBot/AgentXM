@@ -1,0 +1,13 @@
+{
+    "name": "agentmx-root",
+    "version": "1.0.0",
+    "description": "Root package for AgentMX deployment",
+    "scripts": {
+        "start": "./start.sh",
+        "build": "cd api && npm install",
+        "postinstall": "cd api && npm install"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
