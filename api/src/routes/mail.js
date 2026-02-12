@@ -2,6 +2,7 @@ const express = require("express");
 const db = require("../db");
 const auth = require("../middleware/auth");
 const { genId } = require("../utils");
+const { sendEmail } = require("../services/mailgun");
 
 const r = express.Router();
 r.use(auth);
@@ -48,6 +49,10 @@ r.post("/send", (req, res) => {
   const id = genId(), m = req.mailbox;
   db.run("INSERT INTO messages (id,mailbox_id,direction,from_address,to_address,subject,body_text,body_html) VALUES (?,?,'outbound',?,?,?,?,?)",
     [id, m.id, m.email, to, subject || "(no subject)", body || "", body_html || ""]);
+
+  // Attempt to send real email (fire and forget)
+  sendEmail({ from: m.email, to, subject: subject || "(no subject)", text: body, html: body_html }).catch(console.error);
+
   res.status(201).json({ success: true, message: { id, from: m.email, to, subject: subject || "(no subject)" } });
 });
 
@@ -60,6 +65,10 @@ r.post("/:id/reply", (req, res) => {
   const subj = orig.subject.startsWith("Re: ") ? orig.subject : `Re: ${orig.subject}`;
   db.run("INSERT INTO messages (id,mailbox_id,direction,from_address,to_address,subject,body_text,body_html) VALUES (?,?,'outbound',?,?,?,?,?)",
     [id, req.mailbox.id, req.mailbox.email, orig.from_address, subj, body || "", body_html || ""]);
+
+  // Attempt to send real email (fire and forget)
+  sendEmail({ from: req.mailbox.email, to: orig.from_address, subject: subj, text: body, html: body_html }).catch(console.error);
+
   res.status(201).json({ success: true, message: { id, from: req.mailbox.email, to: orig.from_address, subject: subj } });
 });
 
