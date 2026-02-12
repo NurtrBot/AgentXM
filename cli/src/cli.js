@@ -153,7 +153,8 @@ async function cmdInit(opts) {
   }
 
   // 4. Create
-  console.log(c.dim("\n  Creating mailbox..."));
+  console.log(c.dim(`\n  Connecting to ${endpoint}...`));
+  console.log(c.dim("  Creating mailbox..."));
   try {
     const client = new AgentMail({ endpoint });
     const result = await client.createMailbox(handle, botName, password);
@@ -166,14 +167,25 @@ async function cmdInit(opts) {
     if (fs.existsSync(gi) && !fs.readFileSync(gi, "utf8").includes(".agentmx"))
       fs.appendFileSync(gi, "\n.agentmx/\n");
 
-    console.log("\n" + c.green("  ✅ You're all set!"));
+    console.log("\n" + c.green("  ✅ Mailbox created successfully!"));
     console.log("  " + LINE);
     console.log(`  📧 Email:    ${c.cyan(mb.email)}`);
     console.log(`  🤖 Bot:      ${mb.bot_name}`);
     console.log(`  🔑 Config:   ${c.dim(confPath())}`);
-    console.log("\n" + c.yellow(`  📬 Send a test email to ${c.bold(mb.email)} to confirm!\n`));
+    console.log("\n" + c.yellow(`  📬 ACTION: Send a test email to ${c.bold(mb.email)} right now!`));
+    console.log("\n" + c.bold("  🚀 Recommended next commands:"));
+    console.log(`     ${c.green("agentmail inbox")}      Check for new messages`);
+    console.log(`     ${c.green("agentmail send")}       Send an email`);
+    console.log(`     ${c.green("agentmail status")}     View mailbox stats`);
+    console.log("");
   } catch (e) {
-    console.log(c.red(`\n  ✖ ${e.message}\n`));
+    if (e.message.includes("ECONNREFUSED")) {
+      console.log(c.red(`\n  ✖ Could not connect to API at ${endpoint}`));
+      console.log(c.dim("    Make sure the API server is running in another terminal:"));
+      console.log(c.dim("    cd agentmail/api && npm start\n"));
+    } else {
+      console.log(c.red(`\n  ✖ ${e.message}\n`));
+    }
     process.exit(1);
   }
 }
