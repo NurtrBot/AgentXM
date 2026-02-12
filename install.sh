@@ -13,7 +13,7 @@ if ! command -v git &> /dev/null; then
     echo "❌ Error: git is not installed."
     exit 1
 fi
-if ! command -v npm &> /dev /null; then
+if ! command -v npm &> /dev/null; then
     echo "❌ Error: npm is not installed. Please install Node.js."
     exit 1
 fi
