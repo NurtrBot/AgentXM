@@ -4,16 +4,16 @@ set -e
 # Configuration
 # TODO: Replace with your actual repository URL
 REPO_URL="https://github.com/NurtrBot/AgentXM.git" 
-INSTALL_DIR="$HOME/agentmail"
+INSTALL_DIR="$HOME/agentmx"
 
-echo "🤖 Installing AgentMail..."
+echo "⬇️  Cloning AgentMX..."
 
 # Check prerequisites
 if ! command -v git &> /dev/null; then
     echo "❌ Error: git is not installed."
     exit 1
 fi
-if ! command -v npm &> /dev/null; then
+if ! command -v npm &> /dev /null; then
     echo "❌ Error: npm is not installed. Please install Node.js."
     exit 1
 fi
@@ -39,7 +39,7 @@ cd ..
 echo "📥 Installing CLI dependencies..."
 cd cli
 npm install
-# Link CLI globally so 'agentmail' works anywhere
+# Link CLI globally so 'agentmx' works anywhere
 echo "🔗 Linking CLI command..."
 try_link() {
   if [ "$(id -u)" -ne 0 ] && [ ! -w "$(npm config get prefix)/bin" ]; then
@@ -58,5 +58,6 @@ echo "1. Start the API server in a new terminal:"
 echo "   cd $INSTALL_DIR/api && npm start"
 echo ""
 echo "2. Initialize your mailbox:"
-echo "   agentmail init"
+echo "   agentmx init"
+  # AgentMX Installer
 echo "------------------------------------------------"

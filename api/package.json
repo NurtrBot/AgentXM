@@ -1,7 +1,7 @@
 {
-  "name": "agentmail-api",
+  "name": "agentmx-api",
   "version": "1.0.0",
-  "description": "AgentMail API Server",
+  "description": "AgentMX API Server",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",

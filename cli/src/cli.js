@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
 const { Command } = require("commander");
-const AgentMail = require("./client");
+const AgentMX = require("./client");
 
 // ─── ANSI helpers ────────────────────────────────────────────────
 const c = {
@@ -28,7 +28,7 @@ function hasConf() { return fs.existsSync(confPath()); }
 function loadConf() {
   if (!hasConf()) {
     console.log(c.red("\n  No AgentMX config found."));
-    console.log(c.dim("  Run: npx agentmail init\n"));
+    console.log(c.dim("  Run: npx agentmx init\n"));
     process.exit(1);
   }
   return JSON.parse(fs.readFileSync(confPath(), "utf8"));
@@ -42,7 +42,7 @@ function saveConf(data) {
 
 function getClient() {
   const conf = loadConf();
-  return new AgentMail({ apiKey: conf.apiKey, endpoint: conf.endpoint, email: conf.email, botName: conf.botName });
+  return new AgentMX({ apiKey: conf.apiKey, endpoint: conf.endpoint, email: conf.email, botName: conf.botName });
 }
 
 // ─── Prompt helpers ──────────────────────────────────────────────
@@ -156,7 +156,7 @@ async function cmdInit(opts) {
   console.log(c.dim(`\n  Connecting to ${endpoint}...`));
   console.log(c.dim("  Creating mailbox..."));
   try {
-    const client = new AgentMail({ endpoint });
+    const client = new AgentMX({ endpoint });
     const result = await client.createMailbox(handle, botName, password);
     const mb = result.mailbox;
 
@@ -174,9 +174,9 @@ async function cmdInit(opts) {
     console.log(`  🔑 Config:   ${c.dim(confPath())}`);
     console.log("\n" + c.yellow(`  📬 ACTION: Send a test email to ${c.bold(mb.email)} right now!`));
     console.log("\n" + c.bold("  🚀 Recommended next commands:"));
-    console.log(`     ${c.green("agentmail inbox")}      Check for new messages`);
-    console.log(`     ${c.green("agentmail send")}       Send an email`);
-    console.log(`     ${c.green("agentmail status")}     View mailbox stats`);
+    console.log(`     ${c.green("agentmx inbox")}      Check for new messages`);
+    console.log(`     ${c.green("agentmx send")}       Send an email`);
+    console.log(`     ${c.green("agentmx status")}     View mailbox stats`);
     console.log("");
   } catch (e) {
     if (e.message.includes("ECONNREFUSED")) {
@@ -210,7 +210,7 @@ async function cmdInbox() {
       m.is_read ? " " : c.blue("●"),
     ]);
     table(["#", "From", "Subject", "Date", ""], rows, [3, 25, 30, 16, 2]);
-    console.log(c.dim(`  ${total} messages | agentmail read <#> to open\n`));
+    console.log(c.dim(`  ${total} messages | agentmx read <#> to open\n`));
   } catch (e) { console.log(c.red(`\n  ✖ ${e.message}\n`)); }
 }
 
@@ -292,7 +292,7 @@ async function cmdStatus() {
 }
 
 async function cmdConfig() {
-  if (!hasConf()) { console.log(c.red("\n  No config. Run: npx agentmail init\n")); return; }
+  if (!hasConf()) { console.log(c.red("\n  No config. Run: npx agentmx init\n")); return; }
   const conf = loadConf();
   console.log("\n" + c.bold("  AgentMX Config"));
   console.log("  " + LINE);
@@ -306,7 +306,7 @@ async function cmdConfig() {
 
 // ─── Program ─────────────────────────────────────────────────────
 const prog = new Command();
-prog.name("agentmail").description("Email for AI agents.").version("1.0.0");
+prog.name("agentmx").description("Email for AI agents.").version("1.0.0");
 prog.command("init").description("Set up a new agent mailbox").option("-e, --endpoint <url>", "API URL").action(cmdInit);
 prog.command("inbox").description("View inbox").action(cmdInbox);
 prog.command("sent").description("View sent mail").action(cmdSent);

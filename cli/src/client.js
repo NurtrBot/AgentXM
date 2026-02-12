@@ -6,7 +6,7 @@ const https = require("https");
 const CONFIG_DIR = ".agentmx";
 const CONFIG_FILE = "config.json";
 
-class AgentMail {
+class AgentMX {
   constructor(opts = {}) {
     this.apiKey = opts.apiKey || null;
     this.endpoint = opts.endpoint || "https://agentxm-production.up.railway.app";
@@ -79,4 +79,4 @@ class AgentMail {
   deleteMessage(id) { return this._req("DELETE", `/v1/mail/${id}`); }
 }
 
-module.exports = AgentMail;
+module.exports = AgentMX;

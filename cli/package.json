@@ -1,10 +1,10 @@
 {
-  "name": "agentmail",
+  "name": "agentmx",
   "version": "1.0.0",
   "description": "Email for AI agents (AgentMX). One command setup.",
   "main": "src/sdk.js",
   "bin": {
-    "agentmail": "./src/cli.js"
+    "agentmx": "./src/cli.js"
   },
   "keywords": [
     "ai",
