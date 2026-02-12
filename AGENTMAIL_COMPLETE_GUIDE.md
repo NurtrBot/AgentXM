@@ -43,7 +43,7 @@ agentmail/
 cd agentmail/api
 npm install
 node src/index.js
-# 🤖 AgentMX API running on http://localhost:3001
+# 🤖 AgentMX API running on https://agentxm-production.up.railway.app
 ```
 
 ### API Endpoints
@@ -111,7 +111,7 @@ const PORT = process.env.PORT || 3001;
 
 db.init().then(() => {
   app.listen(PORT, () => {
-    console.log(`\n  🤖 AgentMX API running on http://localhost:${PORT}\n`);
+    console.log(`\n  🤖 AgentMX API running on ${process.env.PORT || 3001}\n`);
   });
 }).catch(e => { console.error("DB init failed:", e); process.exit(1); });
 
