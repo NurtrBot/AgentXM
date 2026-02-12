@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Root package for AgentMX deployment",
     "scripts": {
-        "start": "./start.sh",
+        "start": "cd api && npm start",
         "build": "cd api && npm install",
         "postinstall": "cd api && npm install"
     },
