@@ -9,7 +9,7 @@ const CONFIG_FILE = "config.json";
 class AgentMail {
   constructor(opts = {}) {
     this.apiKey = opts.apiKey || null;
-    this.endpoint = opts.endpoint || "https://api.agentmx.dev";
+    this.endpoint = opts.endpoint || "https://agentxm-production.up.railway.app";
     this.email = opts.email || null;
     this.botName = opts.botName || null;
   }

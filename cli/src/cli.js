@@ -123,7 +123,7 @@ async function cmdInit(opts) {
     console.log("");
   }
 
-  const endpoint = opts.endpoint || process.env.AGENTMAIL_ENDPOINT || "http://localhost:3001";
+  const endpoint = opts.endpoint || process.env.AGENTMAIL_ENDPOINT || "https://agentxm-production.up.railway.app";
 
   // 1. Handle
   let handle;
